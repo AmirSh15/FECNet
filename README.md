@@ -1,6 +1,6 @@
 # FECNet
 
-<img src="figures/2.png" 
+<img src="figures/2.png" />
 
 This module contains code in support of the paper [A Compact Embedding for Facial Expression Similarity](http://openaccess.thecvf.com/content_CVPR_2019/papers/Vemulapalli_A_Compact_Embedding_for_Facial_Expression_Similarity_CVPR_2019_paper.pdf). The experiment is implemented using the PyTorch framework.
 
