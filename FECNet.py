@@ -79,7 +79,6 @@ if __name__ == '__main__':
     tr_dataloader, val_dataloader = DATALoader(csv_file='data/labels.csv', val_ratio=args.val_ratio,
                                                num_workers=args.num_workers, batch_size=args.batch_size)
 
-    # model.load_state_dict(torch.load('checkpoint_50_full_data.pt'))
 
     for epoch in range(args.epochs):
         # scheduler.step()
@@ -87,9 +86,7 @@ if __name__ == '__main__':
         # Training
         for i_batch, sample_batched in enumerate(tr_dataloader):
             model.zero_grad()
-            # if(sample_batched is None) or (sample_batched.shape[0] == 0):
-            #     print('Skip')
-            #     continue
+
             targets = model(torch.FloatTensor(sample_batched).view(sample_batched.shape[0] * 3, 3, 224, 224).cuda())
 
             loss, cor = triplet_loss(targets)
@@ -110,9 +107,6 @@ if __name__ == '__main__':
             with torch.no_grad():
                 running_loss_Valid = 0
                 for i_batch, sample_batched in enumerate(val_dataloader):
-                    # if (sample_batched is None) or (sample_batched.shape[0] == 0):
-                    #     print('Skip')
-                    #     continue
                     targets = model(
                         torch.FloatTensor(sample_batched).view(sample_batched.shape[0] * 3, 3, 224, 224).cuda())
 
@@ -135,14 +129,3 @@ if __name__ == '__main__':
             if early_stopping.early_stop:
                 print("Early stopping")
                 break
-        # if epoch%50 ==0:
-        # torch.save(model.state_dict(), 'checkpoint_mine.pt')
-
-    torch.save(model.state_dict(), 'checkpoint_200.pt')
-
-
-
-
-
-
-
