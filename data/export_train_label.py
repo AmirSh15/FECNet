@@ -14,7 +14,7 @@ def grade_mode(list):
 
 
 def creat_label():
-    FEC_dataset_path = 'FEC_dataset/faceexp-comparison-data-train-public.csv'
+    FEC_dataset_path = 'data/FEC_dataset/faceexp-comparison-data-train-public.csv'
     dataset = pd.read_csv(FEC_dataset_path, header=None, error_bad_lines=False)
 
     new_dataset = {}
@@ -45,4 +45,4 @@ def creat_label():
     new_dataset[4]=modes
     new_data = pd.DataFrame(new_dataset)
 
-    new_data.to_csv('labels.csv')
+    new_data.to_csv('data/labels.csv')

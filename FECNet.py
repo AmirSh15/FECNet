@@ -46,6 +46,8 @@ if __name__ == '__main__':
                         help='Ratio of number of Validation data.')
     parser.add_argument('--num_workers', dest='num_workers', type=int,
                         help='Number of workers to load data.',default=4)
+    parser.add_argument('--pretrained', dest='pretrained', type=bool,
+                        help='Use pretrained weightts of FECNet.', default=True)
     args = parser.parse_args()
 
 
@@ -62,7 +64,7 @@ if __name__ == '__main__':
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(0)
 
-    model = FECNet()
+    model = FECNet(pretrained=args.pretrained)
     Num_Param = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print("Number of Trainable Parameters= %d" % (Num_Param))
 

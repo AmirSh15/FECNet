@@ -3,6 +3,8 @@ from models.densenet import DenseNet
 import torch
 import torch.nn as nn
 import requests
+import os
+from requests.adapters import HTTPAdapter
 
 
 class FECNet(nn.Module):
@@ -40,26 +42,47 @@ class FECNet(nn.Module):
         out = self.dense(feat)
         return out
 
-    def load_weights(mdl):
-        """Download pretrained state_dict and load into model.
+def get_confirm_token(response):
+    for key, value in response.cookies.items():
+        if key.startswith('download_warning'):
+            return value
 
-            Arguments:
-            mdl {torch.nn.Module} -- Pytorch model."""
+def save_response_content(response, destination):
+    CHUNK_SIZE = 32768
 
-        path = 'https://drive.google.com/uc?export=download&id=1cWLH_hPns8kSfMz9kKl9PsG5aNV2VSMn'
+    with open(destination, "wb") as f:
+        for chunk in response.iter_content(CHUNK_SIZE):
+            if chunk: # filter out keep-alive new chunks
+                f.write(chunk)
 
-        model_dir = os.path.join(os.getcwd(), '/pretrained')
-        os.makedirs(model_dir, exist_ok=True)
+def load_weights(mdl):
+    """Download pretrained state_dict and load into model.
 
-        state_dict = {}
-        cached_file = os.path.join(model_dir, '{}_{}.pt'.format(name, path[-10:]))
-        if not os.path.exists(cached_file):
-            print('Downloading weights')
-            s = requests.Session()
-            s.mount('https://', HTTPAdapter(max_retries=10))
-            r = s.get(path, allow_redirects=True)
-            with open(cached_file, 'wb') as f:
-                f.write(r.content)
-        state_dict.update(torch.load(cached_file))
+        Arguments:
+        mdl {torch.nn.Module} -- Pytorch model."""
 
-        mdl.load_state_dict(state_dict)
+    path = 'https://drive.google.com/uc?export=download&id=1iTG-aqh88HBWTWRNN_IAHEoS8J-ns0jx'
+
+
+    model_dir = os.path.join(os.getcwd(), './pretrained')
+    os.makedirs(model_dir, exist_ok=True)
+
+    cached_file = os.path.join(model_dir, 'FECNet_AS20112019p.pt')
+    if not os.path.exists(cached_file):
+        print('Downloading weights')
+        URL = "https://docs.google.com/uc?export=download"
+
+        session = requests.Session()
+        id = '1iTG-aqh88HBWTWRNN_IAHEoS8J-ns0jx'
+
+        response = session.get(URL, params={'id': id}, stream=True)
+        token = get_confirm_token(response)
+
+        if token:
+            params = {'id': id, 'confirm': token}
+            response = session.get(URL, params=params, stream=True)
+
+        save_response_content(response, cached_file)
+
+
+    mdl.load_state_dict(torch.load(cached_file))
