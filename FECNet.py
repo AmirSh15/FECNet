@@ -13,27 +13,23 @@ from utils.data_prep import DATALoader
 
 
 ### functions
-def triplet_loss(y_true, y_pred):
-    
-    ref = y_pred[0::3,:]
-    pos = y_pred[1::3,:]
-    neg = y_pred[2::3,:]
-    L12 = (ref-pos).pow(2).sum(1)
-    L13 = (ref-neg).pow(2).sum(1)
-    L23 = (pos-neg).pow(2).sum(1)
-    correct = (L12<L13) * (L12<L23)
+def triplet_loss(y_pred):
+    ref = y_pred[0::3, :]
+    pos = y_pred[1::3, :]
+    neg = y_pred[2::3, :]
+    L12 = (ref - pos).pow(2).sum(1)
+    L13 = (ref - neg).pow(2).sum(1)
+    L23 = (pos - neg).pow(2).sum(1)
+    correct = (L12 < L13) * (L12 < L23)
 
     alpha = 0.2
-    d1 = F.relu((L12-L13)+alpha)
-    d2 = F.relu((L12-L23)+alpha)
-    d = torch.mean(d1+d2)
+    d1 = F.relu((L12 - L13) + alpha)
+    d2 = F.relu((L12 - L23) + alpha)
+    d = torch.mean(d1 + d2)
     return d, torch.sum(correct)
 
 
-
-
-
-if __name__=='__main__':
+if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='PyTorch FECNet')
     parser.add_argument('--device', type=int, default=0,
@@ -47,12 +43,18 @@ if __name__=='__main__':
     parser.add_argument('--val_ratio', type=float, default=0.1,
                         help='Ratio of number of Validation data.')
     parser.add_argument('--num_workers', dest='num_workers', type=int,
-            help='Number of workers to load data.')
+                        help='Number of workers to load data.')
     args = parser.parse_args()
 
-    #set up seeds and gpu device
+
+    # loading data
+    if not os.path.exists('data/train'):
+        os.makedirs('data/train', exist_ok=True)
+    os.system('python export_train_label.py')
+
+    # set up seeds and gpu device
     torch.manual_seed(0)
-    np.random.seed(0)    
+    np.random.seed(0)
     device = torch.device("cuda:" + str(args.device)) if torch.cuda.is_available() else torch.device("cpu")
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(0)
@@ -69,9 +71,10 @@ if __name__=='__main__':
     running_loss = 0
     print_per_epoch = 1
     correct = 0
-    all = 0
+    Len = 0
 
-    tr_dataloader, val_dataloader = DATALoader(csv_file=, val_ratio=args.val_ratio, num_workers=args.num_workers, batch_size=args.batch_size)
+    tr_dataloader, val_dataloader = DATALoader(csv_file='data/label.csv', val_ratio=args.val_ratio,
+                                               num_workers=args.num_workers, batch_size=args.batch_size)
 
     # model.load_state_dict(torch.load('checkpoint_50_full_data.pt'))
 
@@ -84,10 +87,10 @@ if __name__=='__main__':
             # if(sample_batched is None) or (sample_batched.shape[0] == 0):
             #     print('Skip')
             #     continue
-            targets = model(torch.FloatTensor(sample_batched).view(sample_batched.shape[0]*3, 3, 224, 224).cuda())
+            targets = model(torch.FloatTensor(sample_batched).view(sample_batched.shape[0] * 3, 3, 224, 224).cuda())
 
             loss, cor = triplet_loss(0, targets)
-            all += sample_batched.shape[0]
+            Len += sample_batched.shape[0]
             correct += cor.detach().cpu().numpy()
 
             loss.backward()
@@ -98,28 +101,29 @@ if __name__=='__main__':
         if epoch % print_per_epoch == print_per_epoch - 1:  # print every 1 mini-batches
 
             # Validation
-            all_val = 0
+            Len_val = 0
             correct_val = 0
 
             with torch.no_grad():
                 running_loss_Valid = 0
                 for i_batch, sample_batched in enumerate(val_dataloader):
- 
                     # if (sample_batched is None) or (sample_batched.shape[0] == 0):
                     #     print('Skip')
                     #     continue
-                    targets = model(torch.FloatTensor(sample_batched).view(sample_batched.shape[0]*3, 3, 224, 224).cuda())
+                    targets = model(
+                        torch.FloatTensor(sample_batched).view(sample_batched.shape[0] * 3, 3, 224, 224).cuda())
 
-                    loss, cor = triplet_loss(0, targets)
-                    all_val += sample_batched.shape[0]
+                    loss, cor = triplet_loss(targets)
+                    Len_val += sample_batched.shape[0]
                     correct_val += cor.detach().cpu().numpy()
                     running_loss_Valid += loss.detach().cpu().numpy()
 
-            print('[%d, %5d] loss: %.9f      Val_acc: %.5f    Train_acc: %.5f' % (epoch + 1, tr_dataset.__len__(),
-                   running_loss / print_per_epoch, correct_val / all_val, correct/all))
+            print('[%d, %5d] loss: %.9f      Val_acc: %.5f    Train_acc: %.5f' % (epoch + 1, Len,
+                                                                                  running_loss / print_per_epoch,
+                                                                                  correct_val / Len_val, correct / Len))
 
             running_loss = 0
-            all = 0
+            Len = 0
             correct = 0
 
             ### Check early stopping
@@ -129,7 +133,7 @@ if __name__=='__main__':
                 print("Early stopping")
                 break
         # if epoch%50 ==0:
-            # torch.save(model.state_dict(), 'checkpoint_mine.pt')
+        # torch.save(model.state_dict(), 'checkpoint_mine.pt')
 
     torch.save(model.state_dict(), 'checkpoint_200.pt')
 
