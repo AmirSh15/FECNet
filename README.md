@@ -28,7 +28,7 @@ The following pretrained FECNet is available:
 
 | model | pretraining | training | Traing acc | Test acc |
 |-------|-------------|----------|--------------|---------------|
-| inception_resnet_v1 | [VGGFace2](https://arxiv.org/abs/1710.08092) | Google facial expression comparison dataset | 77.5 | 62.4 |
+| inception_resnet_v1 | [VGGFace2](https://arxiv.org/abs/1710.08092) | Google facial expression comparison dataset | 75.0 | 64.3 |
 
 <img src="figures/1.png" />
 
