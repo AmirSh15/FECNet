@@ -1,5 +1,5 @@
-from inception_resnet_v1 import InceptionResnetV1
-from densenet import DenseNet
+from models.inception_resnet_v1 import InceptionResnetV1
+from models.densenet import DenseNet
 import torch
 import torch.nn as nn
 import requests
@@ -14,9 +14,7 @@ class FECNet(nn.Module):
     Subsequent instantiations use the cache rather than redownloading.
 
     Keyword Arguments:
-        pretrained {str} -- Optional pretraining dataset. Either 'vggface2' or 'casia-webface'.
-            (default: {None})
-        dropout_prob {float} -- Dropout probability. (default: {0.6})
+        pretrained {str} -- load pretraining weights
     """
     def __init__(self, pretrained=None):
         super(FECNet, self).__init__()

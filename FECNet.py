@@ -10,6 +10,8 @@ import argparse
 from models.FECNet import FECNet
 from utils.pytorchtools import EarlyStopping
 from utils.data_prep import DATALoader
+from data.export_train_label import creat_label
+from data.image_downloader import download_img
 
 
 ### functions
@@ -43,14 +45,15 @@ if __name__ == '__main__':
     parser.add_argument('--val_ratio', type=float, default=0.1,
                         help='Ratio of number of Validation data.')
     parser.add_argument('--num_workers', dest='num_workers', type=int,
-                        help='Number of workers to load data.')
+                        help='Number of workers to load data.',default=4)
     args = parser.parse_args()
 
 
     # loading data
     if not os.path.exists('data/train'):
         os.makedirs('data/train', exist_ok=True)
-    os.system('python export_train_label.py')
+        creat_label()
+        download_img()
 
     # set up seeds and gpu device
     torch.manual_seed(0)
@@ -73,7 +76,7 @@ if __name__ == '__main__':
     correct = 0
     Len = 0
 
-    tr_dataloader, val_dataloader = DATALoader(csv_file='data/label.csv', val_ratio=args.val_ratio,
+    tr_dataloader, val_dataloader = DATALoader(csv_file='data/labels.csv', val_ratio=args.val_ratio,
                                                num_workers=args.num_workers, batch_size=args.batch_size)
 
     # model.load_state_dict(torch.load('checkpoint_50_full_data.pt'))
@@ -89,7 +92,7 @@ if __name__ == '__main__':
             #     continue
             targets = model(torch.FloatTensor(sample_batched).view(sample_batched.shape[0] * 3, 3, 224, 224).cuda())
 
-            loss, cor = triplet_loss(0, targets)
+            loss, cor = triplet_loss(targets)
             Len += sample_batched.shape[0]
             correct += cor.detach().cpu().numpy()
 

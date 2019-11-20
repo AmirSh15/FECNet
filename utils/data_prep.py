@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 class TripletLoader(Dataset):
-    """Face Landmarks dataset."""
+    """Google face comparing dataset."""
 
     def __init__(self, csv_file, start, end):
         """
@@ -63,9 +63,10 @@ class TripletLoader(Dataset):
 def DATALoader(csv_file, val_ratio, num_workers, batch_size):
     data_len = len(pd.read_csv(csv_file))
     val_len = int(val_ratio * data_len)
-    tr_dataset = TripletLoader(csv_file='data/labels.csv', start=0, end=data_len - val_len)
-    val_dataset = TripletLoader(csv_file='data/labels.csv', start=[], end=-val_len)
+    tr_dataset = TripletLoader(csv_file=csv_file, start=0, end=data_len - val_len)
+    val_dataset = TripletLoader(csv_file=csv_file, start=-val_len, end=None)
     tr_dataloader = DataLoader(tr_dataset, batch_size=batch_size,
-                               shuffle=False, num_workers=num_workers)
+                               shuffle=True, num_workers=num_workers)
     val_dataloader = DataLoader(val_dataset, batch_size=batch_size,
                                 shuffle=True, num_workers=num_workers)
+    return  tr_dataloader, val_dataloader
