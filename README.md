@@ -1,5 +1,7 @@
 # FECNet
 
+<img src="figures/2.png" 
+
 This module contains code in support of the paper [A Compact Embedding for Facial Expression Similarity](http://openaccess.thecvf.com/content_CVPR_2019/papers/Vemulapalli_A_Compact_Embedding_for_Facial_Expression_Similarity_CVPR_2019_paper.pdf). The experiment is implemented using the PyTorch framework.
 
 In this repository, I used the implementation of Inception network from [timesler](https://github.com/timesler/facenet-pytorch) and DenseNet from [gpleiss](https://github.com/gpleiss/efficient_densenet_pytorch)
@@ -28,6 +30,7 @@ The following pretrained FECNet is available:
 |-------|-------------|----------|--------------|---------------|
 | inception_resnet_v1 | [VGGFace2](https://arxiv.org/abs/1710.08092) | Google facial expression comparison dataset | 77.5 | 62.4 |
 
+<img src="figures/1.png" />
 
 ### References
 
