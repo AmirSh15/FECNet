@@ -34,6 +34,7 @@ The following pretrained FECNet is available:
 
 ### References
 
+If you found this repo usefull give me a star!
 
 ```
 @inproceedings{vemulapalli2019compact,
