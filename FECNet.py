@@ -38,14 +38,16 @@ if __name__ == '__main__':
                         help='input batch size for training (default: 240)')
     parser.add_argument('--epochs', type=int, default=200,
                         help='number of epochs to train (default: 200)')
-    parser.add_argument('--lr', type=float, default=0.0001,
-                        help='learning rate (default: 0.0001)')
-    parser.add_argument('--val_ratio', type=float, default=0.1,
+    parser.add_argument('--lr', type=float, default=0.0005,
+                        help='learning rate (default: 0.0005)')
+    parser.add_argument('--val_ratio', type=float, default=0.01,
                         help='Ratio of number of Validation data.')
+    parser.add_argument('--tr_ratio', type=float, default=1,
+                        help='Ratio of number of train data.')
     parser.add_argument('--num_workers', dest='num_workers', type=int,
                         help='Number of workers to load data.',default=4)
     parser.add_argument('--pretrained', dest='pretrained', type=bool,
-                        help='Use pretrained weightts of FECNet.', default=True)
+                        help='Use pretrained weightts of FECNet.', default=False)
     args = parser.parse_args()
 
 
@@ -69,15 +71,14 @@ if __name__ == '__main__':
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     # scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.9)
 
-    early_stopping = EarlyStopping(patience=10, verbose=True)
+    early_stopping = EarlyStopping(patience=50, verbose=True)
 
     running_loss = 0
     print_per_epoch = 1
     correct = 0
     Len = 0
 
-    tr_dataloader, val_dataloader = DATALoader(csv_file='data/labels.csv', val_ratio=args.val_ratio,
-                                               num_workers=args.num_workers, batch_size=args.batch_size)
+    tr_dataloader, val_dataloader = DATALoader(csv_file='data/labels.csv', args=args)
 
 
     for epoch in range(args.epochs):

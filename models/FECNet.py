@@ -18,7 +18,7 @@ class FECNet(nn.Module):
     Keyword Arguments:
         pretrained {str} -- load pretraining weights
     """
-    def __init__(self, pretrained=None):
+    def __init__(self, pretrained=False):
         super(FECNet, self).__init__()
         growth_rate = 64
         depth = 100
@@ -34,7 +34,7 @@ class FECNet(nn.Module):
                         efficient=efficient,
                         num_init_features=512).cuda()
 
-        if pretrained is not None:
+        if (pretrained):
             load_weights(self)
 
     def forward(self, x):

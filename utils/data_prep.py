@@ -60,13 +60,13 @@ class TripletLoader(Dataset):
 
         return X
 
-def DATALoader(csv_file, val_ratio, num_workers, batch_size):
+def DATALoader(csv_file, args):
     data_len = len(pd.read_csv(csv_file))
-    val_len = int(val_ratio * data_len)
-    tr_dataset = TripletLoader(csv_file=csv_file, start=0, end=data_len - val_len)
+    val_len = int(args.val_ratio * data_len)
+    tr_dataset = TripletLoader(csv_file=csv_file, start=0, end=int((data_len - val_len)*args.tr_ratio))
     val_dataset = TripletLoader(csv_file=csv_file, start=-val_len, end=None)
-    tr_dataloader = DataLoader(tr_dataset, batch_size=batch_size,
-                               shuffle=True, num_workers=num_workers)
-    val_dataloader = DataLoader(val_dataset, batch_size=batch_size,
-                                shuffle=True, num_workers=num_workers)
+    tr_dataloader = DataLoader(tr_dataset, batch_size=args.batch_size,
+                               shuffle=False, num_workers=args.num_workers)
+    val_dataloader = DataLoader(val_dataset, batch_size=args.batch_size,
+                                shuffle=True, num_workers=args.num_workers)
     return  tr_dataloader, val_dataloader
