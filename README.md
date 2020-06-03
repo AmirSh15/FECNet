@@ -32,6 +32,8 @@ The following pretrained FECNet is available:
 
 <img src="figures/1.png" />
 
+You can download the pretrained model [here](https://drive.google.com/file/d/1iTG-aqh88HBWTWRNN_IAHEoS8J-ns0jx/view?usp=sharing)
+
 ### References
 
 If you found this repo usefull give me a star!
