@@ -36,7 +36,7 @@ You can download the pretrained model [here](https://drive.google.com/file/d/1iT
 
 ### References
 
-If you found this repo usefull give me a star!
+If you found this repo useful give me a star!
 
 ```
 @inproceedings{vemulapalli2019compact,
