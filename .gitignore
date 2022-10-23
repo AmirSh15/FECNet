@@ -1,0 +1,11 @@
+# directories
+utils/__pycache__/
+models/__pycache__/
+data/__pycache__/
+data/train/
+.idea/
+
+# files
+*.csv
+*.pdf
+*.zip

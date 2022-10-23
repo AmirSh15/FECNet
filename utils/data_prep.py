@@ -1,5 +1,5 @@
 from torch.utils.data import Dataset, DataLoader
-import cv2
+import cv2, os
 import torch
 import numpy as np
 import pandas as pd
@@ -24,19 +24,30 @@ class TripletLoader(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        data = self.Images
-        Class = data.iloc[idx, 4]
-        mode = data.iloc[idx, 5]
-
         X = []
         trainX1 = []
         trainX2 = []
         trainX3 = []
         id = idx
         while (len(X)==0):
-            image_1 = cv2.imread(data.iloc[id, 1])
-            image_2 = cv2.imread(data.iloc[id, 2])
-            image_3 = cv2.imread(data.iloc[id, 3])
+            Class = self.Images.iloc[id, 3]
+            mode = self.Images.iloc[id, 4]
+
+            if not os.path.exists(self.Images.iloc[id, 0]):
+                id = id + 1
+                continue
+            else:
+                image_1 = cv2.imread(self.Images.iloc[id, 0])
+            if not os.path.exists(self.Images.iloc[id, 1]):
+                id = id + 1
+                continue
+            else:
+                image_2 = cv2.imread(self.Images.iloc[id, 1])
+            if not os.path.exists(self.Images.iloc[id, 2]):
+                id = id + 1
+                continue
+            else:
+                image_3 = cv2.imread(self.Images.iloc[id, 2])
             if not (image_1 is None or image_2 is None or image_3 is None):
                 if mode == 1:
                     trainX1.append(np.array(image_3))
@@ -54,6 +65,28 @@ class TripletLoader(Dataset):
                 X.extend(trainX2)
                 X.extend(trainX3)
             id += 1
+
+        # Class = self.Images.iloc[idx, 3]
+        # mode = self.Images.iloc[idx, 4]
+        #
+        # image_1 = cv2.imread(self.Images.iloc[id, 0])
+        # image_2 = cv2.imread(self.Images.iloc[id, 1])
+        # image_3 = cv2.imread(self.Images.iloc[id, 2])
+        # if mode == 1:
+        #     trainX1.append(np.array(image_3))
+        #     trainX2.append(np.array(image_2))
+        #     trainX3.append(np.array(image_1))
+        # elif mode == 2:
+        #     trainX1.append(np.array(image_1))
+        #     trainX2.append(np.array(image_3))
+        #     trainX3.append(np.array(image_2))
+        # elif mode == 3:
+        #     trainX1.append(np.array(image_1))
+        #     trainX2.append(np.array(image_2))
+        #     trainX3.append(np.array(image_3))
+        # X.extend(trainX1)
+        # X.extend(trainX2)
+        # X.extend(trainX3)
 
         X = np.array(X).astype(np.float32).reshape(-1, 3, 224, 224)
 

@@ -8,8 +8,7 @@ import argparse
 from models.FECNet import FECNet
 from utils.pytorchtools import EarlyStopping
 from utils.data_prep import DATALoader
-from data.export_train_label import creat_label
-from data.image_downloader import download_img
+from tqdm import tqdm
 
 
 ### functions
@@ -50,13 +49,6 @@ if __name__ == '__main__':
                         help='Use pretrained weightts of FECNet.', default=False)
     args = parser.parse_args()
 
-
-    # loading data
-    if not os.path.exists('data/train'):
-        os.makedirs('data/train', exist_ok=True)
-        creat_label()
-        download_img()
-
     # set up seeds and gpu device
     torch.manual_seed(0)
     np.random.seed(0)
@@ -80,12 +72,12 @@ if __name__ == '__main__':
 
     tr_dataloader, val_dataloader = DATALoader(csv_file='data/labels.csv', args=args)
 
-
+    print("Training Started")
     for epoch in range(args.epochs):
         # scheduler.step()
 
         # Training
-        for i_batch, sample_batched in enumerate(tr_dataloader):
+        for i_batch, sample_batched in tqdm(enumerate(tr_dataloader), total=len(tr_dataloader), desc=f'epoch {epoch}', leave=False):
             model.zero_grad()
 
             targets = model(torch.FloatTensor(sample_batched).view(sample_batched.shape[0] * 3, 3, 224, 224).cuda())
