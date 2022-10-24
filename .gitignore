@@ -9,3 +9,4 @@ data/train/
 *.csv
 *.pdf
 *.zip
+*.pt

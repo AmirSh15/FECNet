@@ -30,6 +30,8 @@ class TripletLoader(Dataset):
         trainX3 = []
         id = idx
         while (len(X)==0):
+            if id >= len(self.Images):
+                id = 0
             Class = self.Images.iloc[id, 3]
             mode = self.Images.iloc[id, 4]
 
@@ -38,16 +40,25 @@ class TripletLoader(Dataset):
                 continue
             else:
                 image_1 = cv2.imread(self.Images.iloc[id, 0])
+                if image_1.shape != (224, 224, 3):
+                    id = id + 1
+                    continue
             if not os.path.exists(self.Images.iloc[id, 1]):
                 id = id + 1
                 continue
             else:
                 image_2 = cv2.imread(self.Images.iloc[id, 1])
+                if image_2.shape != (224, 224, 3):
+                    id = id + 1
+                    continue
             if not os.path.exists(self.Images.iloc[id, 2]):
                 id = id + 1
                 continue
             else:
                 image_3 = cv2.imread(self.Images.iloc[id, 2])
+                if image_3.shape != (224, 224, 3):
+                    id = id + 1
+                    continue
             if not (image_1 is None or image_2 is None or image_3 is None):
                 if mode == 1:
                     trainX1.append(np.array(image_3))
